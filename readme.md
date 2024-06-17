@@ -22,7 +22,7 @@ By applying public-key-oriented identities and data to a credit system where any
 - Pkarr https://github.com/nuhvi/pkarr
 - Paykit https://github.com/slashtags/paykit/blob/spec/spec.mediawiki
 - Rumble https://github.com/rumble-protocol/rumble
-- Slashtags (tagging, web of trust)
+- Slashtags (tagging, web of trust - not linked because public versions are deprecated, new repos coming soon)
 - decentralized commit https://fiatjaf.com/3cb7c325.html
 - commit methods https://ripple.ryanfugger.com/Protocol/Protocol06.html#commit-methods
 
