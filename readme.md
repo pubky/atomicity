@@ -1,10 +1,13 @@
 **Atomicity**
+
 A peer-to-peer mutual credit system
 
 **Authors**
+
 [John Carvalho](https://github.com/BitcoinErrorLog), [Ar Nazeh](https://github.com/Nuhvi)
 
 **Overview**
+
 Atomicity is a concept for an open peer-to-peer credit protocol that includes solutions for issuance, payments, settlements, and routing. 
 
 It is assumed that trust will always be the most convenient and affordable basis for currency and that the most important questions are about whom to trust, and with what. 
