@@ -116,7 +116,7 @@ While trying to integrate as many payment networks as possible, and achieve the 
 
 *Counterarguments:*
 
-We do not need to support maximum settlement methods as possible", we only need to allow them to be user-defined and mutual. Any matching will be inherent to the supported methods in the client applications. 
+We do not need to support maximum settlement methods, we only need to allow them to be user-defined and mutual. Any matching will be inherent to the supported methods in the client applications. 
 
 We've have to qualify the systems we are comparing somehow - as there are no proven solutions beyond Tether really, or at least this could be argued to some degree...
 
