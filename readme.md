@@ -49,7 +49,7 @@ Users can make signed payment requests to credit issuers. Upon receiving an auth
 
 Credit holders can also settle with the issuer by including extra Paykit endpoints that are simply other Atomicity user keys. This would enable the issuer to transfer credit from one user to another compatible user/key. 
 
-**Routing, Compatible Users **
+**Routing, Compatible Users**
 
 Atomicity utilizes the tagging method, of/like Slashtags, to establish whitelistings of keys, along with credit limits the peer is willing to receive and/or issue to each peer key. Users could also assign default settings for degrees of separation (WoT distance), and effectively establish mutual credit channels with states. 
 
