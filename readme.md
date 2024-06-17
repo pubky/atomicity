@@ -1,4 +1,3 @@
-
 **Atomicity**
 A peer-to-peer mutual credit system
 
