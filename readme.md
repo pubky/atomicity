@@ -17,6 +17,7 @@ There is no base unit or money in the system. Instead, it combines an abstracted
 By applying public-key-oriented identities and data to a credit system where anyone can issue any type of credit to anyone, we can create relative economies where people can dynamically and automatically choose whom they are willing to receive credit from, call/transfer debts, whitelist/blacklist, and make settled payments on behalf of others.
 
 **References**
+
 - Offset https://docs.offsetcredit.org/en/latest/theory/mutual_credit_protocol.html
 - Pkarr https://github.com/nuhvi/pkarr
 - Paykit https://github.com/slashtags/paykit/blob/spec/spec.mediawiki
@@ -26,6 +27,7 @@ By applying public-key-oriented identities and data to a credit system where any
 - commit methods https://ripple.ryanfugger.com/Protocol/Protocol06.html#commit-methods
 
 **Credit Issuance**
+
 Each user is represented by a Pkarr-compatible public-key. Any user can operate a private “ledger” channel state that allocates credit to any other key. When an entry is updated, the counterparty key is made aware of their new credit amount, and its denomination, by serving the data for asynchronous retrieval within a Paykit payment endpoint (could also be posted directly to the peer…)
 
 Credit can be issued in two formats:
@@ -40,12 +42,15 @@ When a user receives a new signed state that is more recent than a previous sign
 This means that at most, a user needs to store (N + C) where N is the number of channels they have, and C is the number of conditional IOUs that is not yet merged to a more recent Signed State. No need to keep history.
 
 **Credit Settlements**
+
 Users can make signed payment requests to credit issuers. Upon receiving an authenticated request, the issuer checks the credit holder’s Paykit payment endpoints, then pays through a mutual payment method if possible.
 
 **Credit Reassignment** 
+
 Credit holders can also settle with the issuer by including extra Paykit endpoints that are simply other Atomicity user keys. This would enable the issuer to transfer credit from one user to another compatible user/key. 
 
 **Routing, Compatible Users **
+
 Atomicity utilizes the tagging method, of/like Slashtags, to establish whitelistings of keys, along with credit limits the peer is willing to receive and/or issue to each peer key. Users could also assign default settings for degrees of separation (WoT distance), and effectively establish mutual credit channels with states. 
 
 While mutual credit channels are straightforward, creating a network out of them presents an extra challenge that Lightning Network does not face: [decentralized commit](https://fiatjaf.com/3cb7c325.html).
@@ -88,6 +93,7 @@ Note about [interactivity](https://github.com/rumble-protocol/rumble?tab=readme-
 If you A wants to pay D but the later is offline, A can contact C instead and ask him for an IOU for D conditional on the publication p and then A can publish p so C can get paid by B. Whenever D is finally online (or through async message), A can send him both C’s IOU and p, so he is considered paid. 
 
 **Delegated Payment Accounts**
+
 Using the same aspects of Paykit that facilitate subscriptions features, users can create delegated account keys for specific web accounts or other use cases, allowing those keys to access remote payments methods and credit lines for payments within an untrusted application.
 
 **Examples**
@@ -97,6 +103,7 @@ Using the same aspects of Paykit that facilitate subscriptions features, users c
 3. Mom is new to Atomicity, but I trust her not to whitelist anyone that is not trustworthy, so I assign a second-degree credit acceptance limit to her friends of $20. Now her friends can use me as a possible route when paying for coffees for which they might not have a compatible payment method, but I do. 
 
 **What is unique here?**
+
 Many aspects of this system are merely a combination of other existing systems, but Offset isn’t exactly the same credit approach and I’m not sure if their work is reusable. Paykit is lacking a lot of the logic to support both its current dynamic payment endpoints and credit as a settlement method. 
 
 We would need to build in these interactions, the ledger/channel format, the signing and requesting flows, and the web of trust tagging & weighting, etc, to meet the described use cases and features.
@@ -104,9 +111,11 @@ We would need to build in these interactions, the ledger/channel format, the sig
 There are of course more details that are not addressed in this document, a big one being how much privacy can be maintained in such a system, failure modes, as well as layers that could be added to the system like enforcement, insurance, DLCs, and more elaborate punishment and reputation systems. 
 
 **Methodological Criticism** 
+
 While trying to integrate as many payment networks as possible, and achieve the most generality (every user is a possible routing node), this approach doesn’t fit with what we keep learning about the value of minimalism, i.e asking what is the least amount of mutations on existing systems that could sufficiently fix their undesirable features. This approach is arguably not minimal, and can’t be so until we ask ourselves what risks in the “private trusted banks” paradigm are we trying to mitigate? and conclude that we can’t sufficiently mitigate such risks without a radical approach. Credibly exitable credit issuers (or resilient Hawala-like network) would be easier to reason about with clear roles and responsibilities.
 
 *Counterarguments:*
+
 We do not need to support maximum settlement methods as possible", we only need to allow them to be user-defined and mutual. Any matching will be inherent to the supported methods in the client applications. 
 
 We've have to qualify the systems we are comparing somehow - as there are no proven solutions beyond Tether really, or at least this could be argued to some degree...
