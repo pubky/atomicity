@@ -12,17 +12,17 @@ Atomicity is a concept for an open peer-to-peer credit protocol that includes so
 
 It is assumed that trust will always be the most convenient and affordable basis for currency and that the most important questions are about whom to trust, and with what. 
 
-There is no base unit or money in the system. Instead, it combines an abstracted extensible payment protocol, *[Paykit](https://github.com/slashtags/paykit/blob/spec/spec.mediawiki)*, with an open key-based censorship-resistant identity system, *[Pkarr](https://github.com/nuhvi/pkarr)*, and an *[Offset](https://docs.offsetcredit.org/en/latest/theory/mutual_credit_protocol.html)*-like mutual credit system, to establish incidental settlement for open credit issuance in any denomination.
+There is no base unit or money in the system. Instead, it combines an abstracted extensible payment protocol, *[Paykit](https://github.com/pubky/paykit/blob/spec/spec.mediawiki)*, with an open key-based censorship-resistant identity system, *[Pkarr](https://github.com/nuhvi/pkarr)*, and an *[Offset](https://docs.offsetcredit.org/en/latest/theory/mutual_credit_protocol.html)*-like mutual credit system, to establish incidental settlement for open credit issuance in any denomination.
 
 By applying public-key-oriented identities and data to a credit system where anyone can issue any type of credit to anyone, we can create relative economies where people can dynamically and automatically choose whom they are willing to receive credit from, call/transfer debts, whitelist/blacklist, and make settled payments on behalf of others.
 
 **References**
 
 - Offset https://docs.offsetcredit.org/en/latest/theory/mutual_credit_protocol.html
-- Pkarr https://github.com/nuhvi/pkarr
-- Paykit https://github.com/slashtags/paykit/blob/spec/spec.mediawiki
+- Pkarr https://github.com/pubky/pkarr
+- Paykit https://github.com/pubky/paykit/blob/spec/spec.mediawiki
 - Rumble https://github.com/rumble-protocol/rumble
-- Slashtags (tagging, web of trust - not linked because public versions are deprecated, new repos coming soon)
+- Pubky https://github.org/pubky
 - decentralized commit https://fiatjaf.com/3cb7c325.html
 - commit methods https://ripple.ryanfugger.com/Protocol/Protocol06.html#commit-methods
 
@@ -51,7 +51,7 @@ Credit holders can also settle with the issuer by including extra Paykit endpoin
 
 **Routing, Compatible Users**
 
-Atomicity utilizes the tagging method, of/like Slashtags, to establish whitelistings of keys, along with credit limits the peer is willing to receive and/or issue to each peer key. Users could also assign default settings for degrees of separation (WoT distance), and effectively establish mutual credit channels with states. 
+Atomicity utilizes the social-tagging and graph method, of/like Pubky, to establish whitelistings of keys, along with credit limits the peer is willing to receive and/or issue to each peer key. Users could also assign default settings for degrees of separation (WoT distance), and effectively establish mutual credit channels with states. 
 
 While mutual credit channels are straightforward, creating a network out of them presents an extra challenge that Lightning Network does not face: [decentralized commit](https://fiatjaf.com/3cb7c325.html).
 
@@ -80,7 +80,7 @@ More about Routing:
 
 To find routes from one user to another, we can follow this naive approach:
 
-1. Everyone that is ready for routing publishes their immediate channels on a specific Slashtags repo.
+1. Everyone that is ready for routing publishes their immediate channels on a specific Pubky repo.
 2. Routers crawl the network(s) and index all the routes for every node to every other node
 3. Routers announce themselves on a well-known hardcoded infohash on mainline
 4. If you want to make a transaction, you find a bunch of Routers from Mainline (see [BEP_0005](https://www.bittorrent.org/beps/bep_0005.html) get_peers), and cross your fingers that one of them is an honest router, not just spam.
