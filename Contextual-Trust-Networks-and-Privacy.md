@@ -14,6 +14,28 @@ Atomicity is a decentralized peer-to-peer (P2P) credit and trust protocol design
 
 Atomicity leverages cryptographic techniques, public key infrastructure, social tagging, and trust metrics to enable users to form secure and private networks of intentional, context-specific relationships. This model significantly reduces the amount of metadata produced and observable by third parties, addressing core privacy vulnerabilities inherent in more traditional anonymity-centric methods.
 
+## Threat Model
+
+A comprehensive threat model clarifies the types of adversaries, their capabilities, and the attacks contextual trust networks seek to mitigate:
+
+- **Adversarial Capabilities**:
+  - **Passive Surveillance**: Adversaries capable of passively observing network traffic and metadata without directly interfering.
+  - **Active Surveillance**: Adversaries who actively manipulate or inject data into the network to observe response patterns.
+  - **Correlation Analysis**: Adversaries conducting long-term statistical analysis to correlate metadata and infer private interactions.
+  - **Insider Threats**: Trusted network participants acting maliciously or compromised through social engineering.
+
+- **Adversarial Goals**:
+  - Deanonymization of network participants
+  - Mapping of trust relationships and social networks
+  - Identification of sensitive or confidential transactions
+  - Disruption of network operations through partitioning or denial-of-service
+
+- **Contextual Trust Network Defense Strategies**:
+  - Limiting metadata production through explicit selection and minimization of involved participants.
+  - Contextual isolation to prevent correlation across distinct trust contexts.
+  - Adaptive routing based on dynamically assessed trustworthiness, minimizing exposure to compromised or adversarial nodes.
+  - Cryptographic identity verification and attestation mechanisms to counter insider threats and maintain integrity of trust channels.
+
 ## Metadata Generation and Privacy
 
 Privacy is fundamentally compromised by metadata, the residual information describing interactions among network participants. Every interaction inherently generates metadata observable by one or more parties (witnesses). Traditional privacy technologies attempt to dilute metadata by dispersing it within large anonymity sets. This approach encounters persistent limitations:
