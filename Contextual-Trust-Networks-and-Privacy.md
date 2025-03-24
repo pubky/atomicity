@@ -101,3 +101,5 @@ Contextual trust networks offer a robust privacy model by explicitly managing an
 - Bonneau, J., et al. (2014). [Mixcoin: Anonymity for Bitcoin with accountable mixes](https://eprint.iacr.org/2014/077.pdf).
 - Danezis, G., Diaz, C. (2008). [A survey of anonymous communication channels](https://www.freehaven.net/anonbib/cache/DD08Survey.pdf).
 - Murdoch, S. J., Danezis, G. (2005). [Low-cost traffic analysis of Tor](https://murdoch.is/papers/oakland05torta.pdf).
+- Johnson, A., Jansen, R., Hopper, N., & Syverson, P. (2023). [Traffic Analysis Attacks on Tor: A Survey](https://css.csail.mit.edu/6.858/2023/readings/tor-traffic-analysis.pdf).
+
