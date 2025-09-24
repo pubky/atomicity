@@ -694,8 +694,4 @@ This separation keeps the kernel tiny and the markets composable.
 * **No refunds, no global log:** Safety from *not entering bad states*; reputation from receipts; optional enforcement via anchors.
 * **Future-proof:** Contracts and punishment systems can latch on without changing the kernel.
 
----
-
-If you want, I can fold these objects and flows directly into the spec repo you’re circulating (schemas + stub APIs + two example strategies: “Prepaid Bucket” and “Netting-first Routing”). That would let your team test: **(a)** fee-free net-beneficial hops, **(b)** CoD quotes on missing edges, and **(c)** streamed micro-intents — all behind flags in Paykit.
-
 
