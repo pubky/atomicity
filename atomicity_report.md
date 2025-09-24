@@ -248,7 +248,7 @@ All preserve invariants: no refunds, no partials, bounded sender loss.
 
 ---
 
-## 6. Summary
+## 6. Summary So Far
 
 Bryan’s report correctly identifies problems with Lightning-style assumptions, but errs by treating them as **unsolved requirements** instead of **designs we explicitly reject**.
 
@@ -262,7 +262,47 @@ Bryan’s report correctly identifies problems with Lightning-style assumptions,
 
 ---
 
-## Areas for Improvement
+Here’s a concise **“Legal Design Principles”** section you can append directly to the Atomicity design report. It reinforces the guardrails without changing mechanics, so your team and Bryan stay aligned on compliance implications:
+
+---
+
+## 7. Legal Design Principles
+
+Atomicity is designed to provide a **peer-to-peer credit routing fabric** without creating regulatory obligations that typically apply to financial intermediaries, clearinghouses, or custodians. The following principles guide its implementation:
+
+1. **Bilateral Obligations Only**
+
+   * All credit lines, vouchers, receipts, and attestations are strictly **between two peers**.
+   * The protocol does not create network-wide liabilities or “system obligations.”
+
+2. **Bounded Commitments**
+
+   * Every promise is explicit, limited in scope, and time-bounded.
+   * Expiry and auto-revert ensure that no open-ended or perpetual obligations exist.
+
+3. **Voluntary Roles**
+
+   * Routers, homeservers, indexers, recovery agents, and credit issuers are **optional helpers**.
+   * No role is mandatory, and no single provider is indispensable.
+
+4. **Subjective Reputation**
+
+   * Reputation is derived from receipts and attestations, but remains **subjective to each peer**.
+   * There is no authoritative or global reputation system.
+
+5. **Settlement Is External**
+
+   * Atomicity routes credit; it does not guarantee or enforce settlement.
+   * Settlements may occur over Bitcoin, Lightning, fiat rails, or contractual arrangements, but these are **adapters outside the core protocol**.
+
+6. **No Custodianship by Default**
+
+   * Homeservers mirror and store user receipts, but they do not intermediate payments, hold balances, or act as fiduciaries.
+
+By adhering to these principles, Atomicity remains a **neutral protocol** that can be used legally in peer-to-peer contexts, while leaving room for regulated entities to build compliant services on top.
+
+
+## 8. Areas for Improvement
 
 1. Reputation System Improvements
 
@@ -305,6 +345,8 @@ The protocol could also introduce a "Conditional Top-Up" mechanism, where the se
 These are solid directions. Here’s a clinical take on each, with trade-offs and **minimal spec deltas** so your team can adopt (or reject) them without derailing the core design.
 
 ---
+
+#### 8.1 Review of Potential Improvements
 
 ## 1) Attestation-Based Reputation (to harden against Sybil)
 
@@ -490,5 +532,170 @@ These are solid directions. Here’s a clinical take on each, with trade-offs an
 
    * Implement **prepaid** + **micro-intents** first; add **ticks** behind a flag.
    * Add **auto\_topup** with hysteresis to avoid flapping.
+  
+---
+
+## 9. Economic Considerations
+
+Atomicity is potentially more than “a p2p credit system” if imagined as the **fabric** that finance (and external punishment/contract systems) anchor onto. Then the most elegant path is a **minimal core** with clean, composable economics. Here’s a design that treats routing, netting, credit creation, and enforcement as *markets* sitting on a tiny set of primitives.
+
+## A. State & Accounting Invariants
+
+* **Identity:** Pubkey identities (Pubky/Ring for delegation).
+* **Edge:** A bilateral **credit line** `A↔B` with:
+
+  * `limit`, `balance` (signed double-entry), `rate` (bps), `expiry`, `grace`, `haircut`.
+* **Claim:** A signed, append-only **receipt** of an event (hold, activate, reassign, net, settle).
+* **Conservation:** Every edge update is paired (A’s asset = B’s liability). No “free value” can appear.
+* **Time:** Everything has **TTL/expiry**. No immortal promises.
+
+> Minimal wire objects: `PaymentIntent`, `CapacityVoucher`, `FinalizeReceipt`, `HopReceipt`, `Reassign`, `NettingSet`, `SettlementReceipt`.
+
+## B. Execution Invariants (safety)
+
+* **Conditional activation + auto-revert:** No refunds; nothing “sticks” without **receiver finalize** inside a short commit window.
+* **All-or-nothing at the receiver:** AON buffer; either total meets `min_deliverable` → finalize, or it all lapses.
+* **Bounded sender loss:** Probe budgets, per-window caps, stamped/PoW probes if needed.
+
+That’s the whole kernel. Everything below builds on it.
+
+---
+
+# Markets on Top of the Core
+
+## 1) Routing as a Market
+
+* **Supply:** Paths offering capacity and latency; advertised via short-TTL **RoutingOffers** with explicit fees (bps/flat) and policy hashes.
+* **Demand:** PaymentIntents with `max_fee`, `latency`, `success_prob` targets.
+* **Price Discovery:** Wallets choose offers; **fee mismatches** are detectable from HopReceipts → reputation/shunning.
+* **Zero-fee routes (when netting):** Fee=0 can be *required* for any hop whose exposure is decreased or unchanged by **same-cycle netting** (see Netting). The protocol flags “net-beneficial hop” so wallets can enforce “fee must be ≤ X” on those hops.
+
+## 2) Credit on Demand (CoD) as a Market
+
+* **Role:** CoD issuers sell *temporary* limits along missing edges to make routes possible.
+* **Instrument:** A signed **TemporaryLimit** (like a voucher) with `amount`, `rate`, `expiry`, `haircut`.
+* **Pricing:** Explicit **carry** (interest/spread), not hidden skim.
+* **Risk Controls:** Haircuts, expiries, and per-issuer caps; receipts make performance measurable → reputation.
+
+> Outcome: “credit creation” is explicit, priced, and revocable by time — not magic. It composes naturally with routing.
+
+## 3) Insurance / Backstops
+
+* **Role:** Sell protection on a path/intent (pay on shortfall).
+* **Mechanics:** Reference the same receipts; pay when `delivered < intent.amount` after expiry.
+* **Incentives:** They prefer routes/hops with better reputation; they price to loss history.
+
+> You get reliability without hard enforcement — via competitive pricing and receipts-based adjudication.
+
+---
+
+# Netting as a First-Class Clearing Layer
+
+## Multilateral Netting Sets
+
+* **Definition:** A **NettingSet** is a bounded batch (time-windowed or event-bounded) of edges `{E_i}` across a subgraph with a solver producing **net reassignments** minimizing gross exposure subject to limits/expiries.
+* **Receipt:** `NettingReceipt` lists (before, after) exposures for each edge; signed by participants (or by policy-authorized netting coordinator), then **Finalized** exactly like payments (AON + auto-revert if not finalized).
+* **Fee Rule (elegant & enforceable):**
+
+  * For each hop `H` in a netting set:
+
+    * If `exposure_after ≤ exposure_before` (hop’s net risk ↓), **routing fee must be 0** (or below a small cap), because the hop is paid by risk reduction.
+    * If `exposure_after > exposure_before`, fees are allowed but bounded by the published policy.
+* **Why it works:** We align fees with *marginal risk*. Netting is a risk-reduction service; you shouldn’t pay someone to reduce their own risk.
+
+> In practice, netting can run continuously in small windows (e.g., per minute). Wallets opt-in per intent with `allow_netting: true`.
+
+---
+
+# Streaming Without Breaking Safety
+
+Support three **payment “shapes”** using the same kernel:
+
+1. **Prepaid Buckets** — top-up once (Finalize), receiver debits as it streams. Pause when empty. No refunds.
+2. **Windowed Micro-Intents** — rolling 1–3s windows, each an AON commitment (Finalize or lapse). Fine-grained, higher overhead, safest.
+3. **Postpaid Ticks** — trusted peers stream service; every tick finalizes or lapses. Efficient when trust is strong.
+
+All preserve: no refunds, no receiver partials, bounded sender exposure.
+
+---
+
+# Contract Hooks (Punishments / External Enforcement)
+
+Keep the core enforcement-agnostic, but expose **anchors**:
+
+* **DLC/DVM Anchor:** Any receipt (Finalize, Netting, Settlement) is hash-addressed. A contract (e.g., DLC) references the hash to unlock collateral based on outcome.
+* **Bond/Fidelity Anchor:** CoD issuers or routers can post **capability-scoped bonds** (time-locked outputs, multisig), with a published **payout policy** keyed to receipts (e.g., pay out on `fee_mismatch` or non-delivery).
+* **Legal/Arb Anchor:** Receipts form an evidentiary chain; exportable bundle for off-chain adjudication.
+
+> The protocol **never** requires these; it just makes them trivial to attach later, per relationship.
+
+---
+
+# Where Economics Live (and don’t)
+
+* **Inside the core:** explicit fee fields, explicit carry (interest), haircuts, expiries, and netting rules. These shape incentives and make pricing visible.
+* **Outside the core:** policy decisions (who pays what, how much) are per market role and discoverable via offers, not baked into consensus.
+
+This separation keeps the kernel tiny and the markets composable.
+
+---
+
+# Why this scales to “fabric for all finance”
+
+* **Completeness:** You can express credit creation, clearing/netting, routing, insurance, and settlement hand-offs with five receipt types and a double-entry edge model.
+* **Orthogonality:** Payments, netting, and settlement share the same AON+Finalize+Expiry mechanics.
+* **Extensibility:** New roles (auctioneers, FX market-makers, factoring desks) just publish offers and issue receipts; nothing new at the kernel.
+* **Observability:** Everything meaningful is a signed receipt; reputation and pricing work off the same substrate.
+
+---
+
+# What to ship (actionable for engineering)
+
+1. **Schemas & Canonicalization**
+
+   * `Edge`, `RoutingOffer`, `PaymentIntent`, `CapacityVoucher`, `FinalizeReceipt`, `HopReceipt`, `Reassign`, `NettingSet`, `NettingReceipt`, `SettlementReceipt`, `TemporaryLimit` (CoD).
+2. **State Machines**
+
+   * Per-hop: `available → held → active* → active → (settle/net/reassign)`.
+   * Receiver AON buffer; streaming windows/ticks are just short-cycle intents.
+3. **Netting Engine (v0)**
+
+   * Greedy bilateral reassignments first; optional MILP/flow solver later.
+   * Fee rule baked in (“risk-reducing hop = zero/low fee”).
+4. **Market APIs**
+
+   * `offers/query`, `cv/request`, `finalize`, `receipts/append`, `netting/propose`, `netting/finalize`, `cod/quote`, `cod/issue`.
+5. **Pricing & Policy**
+
+   * Wallet policy: `max_fee_bps`, `max_probe_spend`, `allow_netting`, `allow_cod`, `min_net_gain_bps`.
+   * Router/issuer policy: publish `policy_hash` in offers; enforce mismatch tagging.
+6. **Reputation Plumbing**
+
+   * Standard tags: `success`, `error_timeout`, `fee_mismatch`, `default`, `net_gain`.
+   * 30-day decay, route-scoped stats.
+
+---
+
+# Open questions worth an economist’s eye (but not blockers)
+
+* **Rate surfaces:** How to parameterize carry vs. one-off fees so that rational routes emerge (e.g., default curves, duration bands)?
+* **Haircuts:** Defaults by tenor & counterparty distance? (We can start with conservative fixed haircuts.)
+* **CoD market microstructure:** Dutch auctions vs. RFQ; slippage protection in short windows.
+* **Netting game theory:** Incentive-compatible disclosures so participants don’t game the solver (caps and verification help).
+
+> These are *refinements*; the core still works with conservative defaults.
+
+---
+
+# Why this is the “most elegant” version
+
+* **Small kernel, big surface:** A handful of receipts and state transitions support payments, streaming, netting, credit creation, insurance, and settlement.
+* **Aligned incentives:** Fees where risk increases; zero/low fees where netting reduces risk; visible pricing; receipts back everything.
+* **No refunds, no global log:** Safety from *not entering bad states*; reputation from receipts; optional enforcement via anchors.
+* **Future-proof:** Contracts and punishment systems can latch on without changing the kernel.
+
+---
+
+If you want, I can fold these objects and flows directly into the spec repo you’re circulating (schemas + stub APIs + two example strategies: “Prepaid Bucket” and “Netting-first Routing”). That would let your team test: **(a)** fee-free net-beneficial hops, **(b)** CoD quotes on missing edges, and **(c)** streamed micro-intents — all behind flags in Paykit.
 
 
