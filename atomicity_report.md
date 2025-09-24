@@ -265,21 +265,25 @@ Bryan’s report correctly identifies problems with Lightning-style assumptions,
 ## Areas for Improvement
 
 1. Reputation System Improvements
+
 The reliance on a partial, localized reputation system is vulnerable to Sybil attacks. An improved design could integrate cryptographic attestations to create a more resilient reputation model without resorting to a global ledger.
 
 Potential Solution: Attestation-Based Reputation. Instead of solely relying on peer-to-peer reputation, the system could introduce attestations. When a transaction is finalized successfully, the sender and receiver could cryptographically sign a receipt confirming the success. These signed receipts, or attestations, could be published to their homeservers. Other nodes could then query these attestations to verify a peer's track record. A reputation score would not just be a subjective rating but a quantifiable measure based on the number and value of signed attestations a node has accumulated, making Sybil attacks more costly and less effective.
 
 2. Routing Efficiency Enhancement
+
 The current design's routing is based on local probes and indexes, which is private but potentially inefficient. A hybrid approach could improve path-finding speed without compromising the core tenet of bounded-trust and privacy.
 
 Potential Solution: Limited, Controlled Information Sharing. The protocol could introduce a new type of message called a "Routing Signal". When a node successfully completes a transaction, it could broadcast a privacy-preserving signal to its direct peers, indicating that a path to a certain network region (e.g., a cluster of nodes) was found to be successful for a specific amount range. This signal would not reveal the full path or transaction details, but would serve as a hint to other nodes, helping them to prioritize probes in more promising directions. This creates a low-overhead, indirect form of "gossip" that is opt-in and does not reveal sensitive information.
 
 3. Mitigating the FinalizeReceipt Bottleneck
+
 The potential for a transaction to auto-revert due to a receiver's node being offline after a successful payment is a significant user experience issue. The design can be improved by adding a mechanism for a trusted recovery agent to handle this scenario.
 
 Potential Solution: Designated Recovery Agent. A receiver could designate a trusted "Recovery Agent" (a third-party node or a homeserver) that is authorized to issue a FinalizeReceipt on their behalf if the receiver's node is non-responsive. Before a payment is sent, the sender could verify the existence of this agent's public key. If the receiver's node doesn't respond within the TTL, the sender could send the Finalize request to the recovery agent. This agent, upon verifying the state and a pre-signed contract, would issue the FinalizeReceipt, ensuring the payment is not lost due to temporary node downtime. This keeps the core principle of auto-revert intact, but adds a safety net.
 
 4. Refining Streaming Payment Models
+
 The three proposed streaming models each have a significant trade-off. A more flexible, hybrid model could combine the benefits of each without introducing new risks.
 
 Potential Solution: Adaptive Hybrid Streaming. Instead of a single model, the protocol could support an adaptive approach where the sender and receiver negotiate a streaming method based on trust and network conditions.
