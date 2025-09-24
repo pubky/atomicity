@@ -1,10 +1,10 @@
-# Atomicity Design Report: Refutation of the Lightning Paradigm and Specification of a Bounded-Trust Model
+# Atomicity Design Report: Refutation of the Lightning Paradigm and Proposal for a Bounded-Trust Model
 
 ---
 
 ## 0. Purpose
 
-This document reconciles differing views on the design of Atomicity. It explains where the Lightning-inspired framing leads to incorrect assumptions, proposes alternative primitives consistent with Atomicity’s goals, and specifies a design that is both minimal and implementable. The report also clarifies how streaming payments can be supported without violating safety.
+This document attempts to reconcile differing views on the design of Atomicity. It explains where the Lightning-inspired framing leads to incorrect assumptions, proposes alternative primitives consistent with Atomicity’s goals, and specifies a design that is both minimal and implementable. The report also clarifies how streaming payments might be supported without violating safety.
 
 Atomicity is **not** intended as a Lightning replica. It is a **bounded-trust credit routing protocol**:
 - No blockchain, no global log.
